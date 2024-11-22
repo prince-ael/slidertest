@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:slidertest/custom_paint/rounded_rect.dart';
 
 const bg = Color(0xFF5B6355);
 const clearColor = Colors.transparent;
@@ -37,9 +38,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(color: Colors.amber),
-          
-          
+          Positioned.fill(child: Image.asset("assets/image/demo.jpeg", fit: BoxFit.fill,)),
+          const Positioned.fill(child: RoundedRectWidget()),
         ],
       ),
     );

@@ -1,34 +1,21 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:slidertest/main.dart';
 
 class RoundedRectWidget extends StatelessWidget {
   const RoundedRectWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(100, 200), // Specify the size of the custom widget
-      painter: OuterInnerRectPainter(),
-    );
+    return CustomPaint(painter: OuterInnerRectPainter());
   }
 }
 
 class OuterInnerRectPainter extends CustomPainter {
-  final Color outerColor;
-  final Color innerColor;
-  final double outerBorderRadius;
-  final double innerBorderRadius;
-
-  OuterInnerRectPainter({
-    this.outerColor = bg,
-    this.innerColor = Colors.red,
-    this.outerBorderRadius = 20.0,
-    this.innerBorderRadius = 10.0,
-  });
+  OuterInnerRectPainter();
 
   @override
   void paint(Canvas canvas, Size size) {
-
     final gradient = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
@@ -40,21 +27,31 @@ class OuterInnerRectPainter extends CustomPainter {
     );
 
     final Paint outerPaint = Paint()
-      ..color = outerColor
-      ..shader = gradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..shader =
+          gradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
 
     final Paint innerPaint = Paint()
-      ..color = innerColor
-      ..style = PaintingStyle.fill;
+    ..strokeWidth = 8.0
+    ..color = const Color(0xFFFED2E8)
+    ..style = PaintingStyle.stroke;
 
     // Outer rectangle size and position
     Rect outerRect = Rect.fromLTWH(0, 0, size.width, size.height);
 
     // Inner rectangle size and position (smaller, inside the outer rectangle)
-    RRect innerRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(30, 30, size.width - 60, size.height - 60),
-      Radius.circular((size.width - 60) / 2),
+    final double innerX = size.width * 0.14;
+    final double innerY = size.width * 0.17;
+    double innerWidth = size.width * 0.71;
+    innerWidth = innerWidth.ceilToDouble();
+    double innerHeight = size.height * 0.43;
+    innerHeight = innerHeight.ceilToDouble();
+
+    log("innerWidth: $innerWidth, innerHeight: $innerHeight");
+    log("outer Width: ${size.width}, outer Height: ${size.height}");
+    final RRect innerRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(innerX, innerY, innerWidth, innerHeight),
+      Radius.circular(innerWidth / 2),
     );
 
     // Clip path to exclude the inner rectangle
@@ -78,3 +75,11 @@ class OuterInnerRectPainter extends CustomPainter {
     return false; // No need to repaint unless the painter data changes
   }
 }
+
+// inner rect => W:H = 256:350
+// outer rect => W:H = 360:800
+// 256 / 360 = 0.71 (iwc)
+// 350 / 800 = 0.43 (ihc)
+
+// 142/800 = 0.175
+// 52/350 = 0.14
