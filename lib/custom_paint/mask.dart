@@ -1,18 +1,36 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
-class RoundedRectWidget extends StatelessWidget {
-  const RoundedRectWidget({super.key});
+class Mask extends StatelessWidget {
+  final double widthFactor;
+  final double aspectRatio;
+  const Mask({
+    super.key,
+    required this.widthFactor,
+    required this.aspectRatio,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(painter: OuterInnerRectPainter());
+    return CustomPaint(
+      painter: MaskPainter(
+        widthFactor,
+        aspectRatio,
+        MediaQuery.of(context).padding.top,
+      ),
+    );
   }
 }
 
-class OuterInnerRectPainter extends CustomPainter {
-  OuterInnerRectPainter();
+class MaskPainter extends CustomPainter {
+  final double widthFactor;
+  final double aspectRatio;
+  final double statusbarHeight;
+  MaskPainter(
+    this.widthFactor,
+    this.aspectRatio,
+    this.statusbarHeight,
+  );
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -32,26 +50,25 @@ class OuterInnerRectPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final Paint innerPaint = Paint()
-    ..strokeWidth = 8.0
-    ..color = const Color(0xFFFED2E8)
-    ..style = PaintingStyle.stroke;
+      ..strokeWidth = 8.0
+      ..color = const Color(0xFFFED2E8)
+      ..style = PaintingStyle.stroke;
 
     // Outer rectangle size and position
     Rect outerRect = Rect.fromLTWH(0, 0, size.width, size.height);
 
     // Inner rectangle size and position (smaller, inside the outer rectangle)
-    final double innerX = size.width * 0.14;
-    final double innerY = size.width * 0.17;
-    double innerWidth = size.width * 0.71;
-    innerWidth = innerWidth.ceilToDouble();
-    double innerHeight = size.height * 0.43;
-    innerHeight = innerHeight.ceilToDouble();
+    final Size innerRectSize = computeInnerRectSize(size);
+    final Offset innerRectOffset = computeInnerRectOffset(innerRectSize, size);
 
-    log("innerWidth: $innerWidth, innerHeight: $innerHeight");
-    log("outer Width: ${size.width}, outer Height: ${size.height}");
     final RRect innerRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(innerX, innerY, innerWidth, innerHeight),
-      Radius.circular(innerWidth / 2),
+      Rect.fromLTWH(
+        innerRectOffset.dx,
+        innerRectOffset.dy,
+        innerRectSize.width,
+        innerRectSize.height,
+      ),
+      Radius.circular(innerRectSize.width / 2),
     );
 
     // Clip path to exclude the inner rectangle
@@ -73,6 +90,21 @@ class OuterInnerRectPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return false; // No need to repaint unless the painter data changes
+  }
+
+  Size computeInnerRectSize(Size outerRectSize) {
+    final innerRectWidth = outerRectSize.width * widthFactor;
+    final innerRectHeight = innerRectWidth / aspectRatio;
+    return Size(innerRectWidth, innerRectHeight);
+  }
+
+  Offset computeInnerRectOffset(Size innerRectSize, Size outerRectSize) {
+    final outerRectHeight = outerRectSize.width / 0.75;
+    final dx = (outerRectSize.width - innerRectSize.width) / 2;
+    final dy = ((outerRectHeight - innerRectSize.height) / 2) +
+        statusbarHeight +
+        kToolbarHeight;
+    return Offset(dx, dy);
   }
 }
 

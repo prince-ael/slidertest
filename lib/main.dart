@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:slidertest/custom_paint/rounded_rect.dart';
+import 'package:slidertest/custom_paint/mask.dart';
 
 const bg = Color(0xFF5B6355);
 const clearColor = Colors.transparent;
@@ -38,55 +38,19 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned.fill(child: Image.asset("assets/image/demo.jpeg", fit: BoxFit.fill,)),
-          const Positioned.fill(child: RoundedRectWidget()),
+          Positioned.fill(
+              child: Image.asset(
+            "assets/image/demo.jpeg",
+            fit: BoxFit.fill,
+          )),
+          const Positioned.fill(
+            child: Mask(
+              widthFactor: 0.7,
+              aspectRatio: 0.73,
+            ),
+          ),
         ],
       ),
     );
   }
 }
-
-class MyRow extends StatelessWidget {
-  final bool isCenter;
-  const MyRow({
-    super.key,
-    this.isCenter = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            color: bg,
-          ),
-        ),
-        isCenter
-            ? Container(
-                width: 200,
-                height: 300,
-                decoration: BoxDecoration(
-                    color: isCenter ? clearColor : bg,
-                    borderRadius:
-                        const BorderRadius.all(Radius.circular(100.0))),
-              )
-            : Expanded(
-                child: Container(
-                  color: bg,
-                ),
-              ),
-        Expanded(
-          child: Container(
-            color: bg,
-          ),
-        )
-      ],
-    );
-  }
-}
-
-// What are the options i see
-// 1. Custom paint
-// 2. ClipPath
-// 3. Masking library
