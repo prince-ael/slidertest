@@ -1,35 +1,38 @@
-
 import 'package:flutter/material.dart';
+import 'package:slidertest/custom_paint/mask_window.dart';
 
 class Mask extends StatelessWidget {
-  final double widthFactor;
-  final double aspectRatio;
+  final MaskWindow maskWindow;
+  final double strokeWidth;
+  final Color strokeColor;
+
   const Mask({
     super.key,
-    required this.widthFactor,
-    required this.aspectRatio,
+    required this.maskWindow,
+    this.strokeWidth = 8.0,
+    this.strokeColor = const Color(0xFFFED2E8),
   });
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       painter: MaskPainter(
-        widthFactor,
-        aspectRatio,
-        MediaQuery.of(context).padding.top,
+        maskWindow,
+        strokeWidth,
+        strokeColor,
       ),
     );
   }
 }
 
 class MaskPainter extends CustomPainter {
-  final double widthFactor;
-  final double aspectRatio;
-  final double statusbarHeight;
+  final MaskWindow maskWindow;
+  final double strokeWidth;
+  final Color strokeColor;
   MaskPainter(
-    this.widthFactor,
-    this.aspectRatio,
-    this.statusbarHeight,
+    this.maskWindow,
+    this.strokeWidth,
+    this.strokeColor,
   );
 
   @override
@@ -44,74 +47,51 @@ class MaskPainter extends CustomPainter {
       ],
     );
 
-    final Paint outerPaint = Paint()
+    final Paint windowParentPaint = Paint()
       ..shader =
           gradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
 
-    final Paint innerPaint = Paint()
-      ..strokeWidth = 8.0
-      ..color = const Color(0xFFFED2E8)
+    final Paint windowPaint = Paint()
+      ..strokeWidth = strokeWidth
+      ..color = strokeColor
       ..style = PaintingStyle.stroke;
 
     // Outer rectangle size and position
-    Rect outerRect = Rect.fromLTWH(0, 0, size.width, size.height);
+    Rect windowParent = Rect.fromLTWH(0, 0, size.width, size.height);
 
     // Inner rectangle size and position (smaller, inside the outer rectangle)
-    final Size innerRectSize = computeInnerRectSize(size);
-    final Offset innerRectOffset = computeInnerRectOffset(innerRectSize, size);
+    final Size windowSize = maskWindow.getSize(size);
+    final Offset windowOffset = maskWindow.getOffset(windowSize, size);
 
-    final RRect innerRect = RRect.fromRectAndRadius(
+    final RRect window = RRect.fromRectAndRadius(
       Rect.fromLTWH(
-        innerRectOffset.dx,
-        innerRectOffset.dy,
-        innerRectSize.width,
-        innerRectSize.height,
+        windowOffset.dx,
+        windowOffset.dy,
+        windowSize.width,
+        windowSize.height,
       ),
-      Radius.circular(innerRectSize.width / 2),
+      Radius.circular(windowSize.width / 2),
     );
 
     // Clip path to exclude the inner rectangle
     Path path = Path()
-      ..addRect(outerRect)
-      ..addRRect(innerRect);
+      ..addRect(windowParent)
+      ..addRRect(window);
     path.fillType = PathFillType.evenOdd;
 
     // Clip the canvas to exclude the inner rectangle
     canvas.clipPath(path);
 
     // Paint the outer area (excluding the inner rectangle)
-    canvas.drawRect(outerRect, outerPaint);
+    canvas.drawRect(windowParent, windowParentPaint);
 
     // Paint the inner rectangle
-    canvas.drawRRect(innerRect, innerPaint);
+    canvas.drawRRect(window, windowPaint);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return false; // No need to repaint unless the painter data changes
   }
-
-  Size computeInnerRectSize(Size outerRectSize) {
-    final innerRectWidth = outerRectSize.width * widthFactor;
-    final innerRectHeight = innerRectWidth / aspectRatio;
-    return Size(innerRectWidth, innerRectHeight);
-  }
-
-  Offset computeInnerRectOffset(Size innerRectSize, Size outerRectSize) {
-    final outerRectHeight = outerRectSize.width / 0.75;
-    final dx = (outerRectSize.width - innerRectSize.width) / 2;
-    final dy = ((outerRectHeight - innerRectSize.height) / 2) +
-        statusbarHeight +
-        kToolbarHeight;
-    return Offset(dx, dy);
-  }
 }
-
-// inner rect => W:H = 256:350
-// outer rect => W:H = 360:800
-// 256 / 360 = 0.71 (iwc)
-// 350 / 800 = 0.43 (ihc)
-
-// 142/800 = 0.175
-// 52/350 = 0.14
