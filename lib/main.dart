@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:slidertest/custom_paint/mask.dart';
 import 'package:slidertest/custom_paint/mask_window.dart';
+import 'package:slidertest/slider/custom_thumb.dart';
 
 const bg = Color(0xFF5B6355);
 const clearColor = Colors.transparent;
+
 void main() {
   runApp(const MyApp());
 }
@@ -56,6 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ScanProgressBar(
             maskWindow: maskWindow,
           ),
+          const MySlider()
         ],
       ),
     );
