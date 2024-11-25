@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:slidertest/custom_paint/mask.dart';
 import 'package:slidertest/custom_paint/mask_window.dart';
-import 'package:slidertest/slider/custom_thumb.dart';
+import 'package:slidertest/progressbar/square_progressbar.dart';
 
 const bg = Color(0xFF5B6355);
 const clearColor = Colors.transparent;
@@ -58,14 +60,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ScanProgressBar(
             maskWindow: maskWindow,
           ),
-          const MySlider()
         ],
       ),
     );
   }
 }
 
-class ScanProgressBar extends StatelessWidget {
+class ScanProgressBar extends StatefulWidget {
   final MaskWindow maskWindow;
   const ScanProgressBar({
     super.key,
@@ -73,25 +74,42 @@ class ScanProgressBar extends StatelessWidget {
   });
 
   @override
+  State<ScanProgressBar> createState() => _ScanProgressBarState();
+}
+
+class _ScanProgressBarState extends State<ScanProgressBar> {
+  int _secondsElapsed = 0;
+  @override
+  void initState() {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsElapsed < 60) {
+        setState(() {
+          _secondsElapsed = _secondsElapsed + 1;
+        });
+      } else {
+        timer.cancel();
+      }
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final scrSize = MediaQuery.of(context).size;
-    final windowSize = maskWindow.getSize(scrSize);
-    final offset = maskWindow.getOffset(windowSize, scrSize);
+    final windowSize = widget.maskWindow.getSize(scrSize);
+    final offset = widget.maskWindow.getOffset(windowSize, scrSize);
     return Positioned(
       top: offset.dy,
       left: offset.dx,
-      child: Container(
-        height: windowSize.height,
+      child: SquareProgressIndicator(
+        value: _secondsElapsed / 60,
+        strokeWidth: 8.0,
+        borderRadius: windowSize.width / 2,
         width: windowSize.width,
-        decoration: BoxDecoration(
-          border: Border.all(
-              width: 4.0,
-              color: Colors.red,
-              strokeAlign: BorderSide.strokeAlignOutside),
-          borderRadius: BorderRadius.all(
-            Radius.circular(windowSize.width / 2),
-          ),
-        ),
+        height: windowSize.height,
+        color: const Color(0xFFCC0066),
+        strokeCap: StrokeCap.square,
+        strokeAlign: SquareStrokeAlign.center,
       ),
     );
   }
