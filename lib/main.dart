@@ -98,11 +98,12 @@ class _ScanProgressBarState extends State<ScanProgressBar> {
     final scrSize = MediaQuery.of(context).size;
     final windowSize = widget.maskWindow.getSize(scrSize);
     final offset = widget.maskWindow.getOffset(windowSize, scrSize);
+    final progress = _secondsElapsed / 60;
     return Positioned(
       top: offset.dy,
       left: offset.dx,
       child: SquareProgressIndicator(
-        value: _secondsElapsed / 60,
+        value: progress,
         strokeWidth: 8.0,
         borderRadius: windowSize.width / 2,
         width: windowSize.width,
