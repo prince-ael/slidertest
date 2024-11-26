@@ -60,6 +60,17 @@ class _MyHomePageState extends State<MyHomePage> {
           ScanProgressBar(
             maskWindow: maskWindow,
           ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                width: 100,
+                height: 100,
+                color: Colors.red,
+              ),
+            ),
+          )
         ],
       ),
     );

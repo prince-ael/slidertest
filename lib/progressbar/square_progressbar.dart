@@ -1,5 +1,3 @@
-library square_percent_indicater;
-
 import 'dart:math';
 import 'dart:ui';
 
@@ -65,26 +63,6 @@ class SquareProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (value == null) {
-      return _IndeterminateSquareProgressIndicator(
-        clockwise: clockwise,
-        borderRadius: borderRadius,
-        color: color ??
-            Theme.of(context).progressIndicatorTheme.color ??
-            Colors.blue,
-        emptyStrokeColor: emptyStrokeColor ??
-            Theme.of(context).progressIndicatorTheme.circularTrackColor ??
-            Colors.transparent,
-        strokeWidth: strokeWidth,
-        emptyStrokeWidth: emptyStrokeWidth,
-        startPosition: startPosition,
-        width: width,
-        height: height,
-        strokeAlign: strokeAlign,
-        strokeCap: strokeCap,
-        child: child,
-      );
-    }
     return SizedBox(
       width: width,
       height: height,
@@ -266,7 +244,7 @@ class _SquareProgressIndicatorStrokePainter extends CustomPainter {
         canvas.drawCircle(tangent.position, 20, thumbPaint);
 
         final TextSpan span = TextSpan(
-          text: formateValue(value), 
+          text: formateValue(value),
           style: const TextStyle(
             color: Colors.white,
             fontSize: 12,
@@ -333,100 +311,4 @@ enum SquareStrokeAlign {
 
   ///When you use [inside], stroke line is drawn inside the rectangle bounds, this is default value.
   inside
-}
-
-class _IndeterminateSquareProgressIndicator extends StatefulWidget {
-  final double width;
-  final double height;
-  final double borderRadius;
-  final Color color;
-  final Color emptyStrokeColor;
-  final double strokeWidth;
-  final double emptyStrokeWidth;
-  final Widget? child;
-  final bool clockwise;
-  final double startPosition;
-  final SquareStrokeAlign strokeAlign;
-  final StrokeCap? strokeCap;
-
-  const _IndeterminateSquareProgressIndicator({
-    super.key,
-    required this.clockwise,
-    required this.borderRadius,
-    required this.color,
-    required this.emptyStrokeColor,
-    required this.strokeWidth,
-    required this.emptyStrokeWidth,
-    required this.startPosition,
-    required this.width,
-    required this.height,
-    required this.strokeAlign,
-    this.strokeCap,
-    this.child,
-  });
-
-  @override
-  State<_IndeterminateSquareProgressIndicator> createState() =>
-      _IndeterminateSquareProgressIndicatorState();
-}
-
-class _IndeterminateSquareProgressIndicatorState
-    extends State<_IndeterminateSquareProgressIndicator>
-    with TickerProviderStateMixin {
-  late AnimationController _controller;
-  late AnimationController _controller2;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 350 * 8));
-    _controller2 = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300 * 2));
-    _controller.repeat();
-    _controller2.repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _controller2.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      builder: (context, w) {
-        return AnimatedBuilder(
-            animation: _controller2,
-            builder: (context, w) {
-              var anim2val = _controller2
-                      .drive(CurveTween(curve: Curves.easeInOutQuart))
-                      .value *
-                  .7;
-              return SquareProgressIndicator(
-                value: anim2val,
-                clockwise: widget.clockwise,
-                borderRadius: widget.borderRadius,
-                color: widget.color,
-                emptyStrokeColor: widget.emptyStrokeColor,
-                strokeWidth: widget.strokeWidth,
-                emptyStrokeWidth: widget.emptyStrokeWidth,
-                startPosition: (widget.startPosition +
-                        (widget.clockwise
-                            ? _controller.value
-                            : (1 - _controller.value))) %
-                    1,
-                width: widget.width,
-                height: widget.height,
-                strokeAlign: widget.strokeAlign,
-                strokeCap: widget.strokeCap,
-                child: widget.child,
-              );
-            });
-      },
-      animation: _controller,
-    );
-  }
 }
