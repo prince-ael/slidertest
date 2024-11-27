@@ -66,24 +66,30 @@ class SquareProgressIndicator extends StatelessWidget {
     return SizedBox(
       width: width,
       height: height,
-      child: CustomPaint(
-        painter: _SquareProgressIndicatorStrokePainter(
-          startPosition: startPosition,
-          value: value!,
-          color: color ??
-              Theme.of(context).progressIndicatorTheme.color ??
-              Colors.blue,
-          emptyStrokeColor: emptyStrokeColor ??
-              Theme.of(context).progressIndicatorTheme.circularTrackColor ??
-              Colors.transparent,
-          clockwise: clockwise,
-          strokeWidth: strokeWidth,
-          emptyStrokeWidth: emptyStrokeWidth,
-          borderRadius: borderRadius,
-          strokeAlign: strokeAlign,
-          strokeCap: strokeCap,
-        ),
-        child: Center(child: child),
+      child: TweenAnimationBuilder<double>(
+        duration: const Duration(seconds: 1),
+        tween: Tween(begin: 0, end: value),
+        builder: (context, value, child) {
+          return CustomPaint(
+            painter: _SquareProgressIndicatorStrokePainter(
+              startPosition: startPosition,
+              value: value,
+              color: color ??
+                  Theme.of(context).progressIndicatorTheme.color ??
+                  Colors.blue,
+              emptyStrokeColor: emptyStrokeColor ??
+                  Theme.of(context).progressIndicatorTheme.circularTrackColor ??
+                  Colors.transparent,
+              clockwise: clockwise,
+              strokeWidth: strokeWidth,
+              emptyStrokeWidth: emptyStrokeWidth,
+              borderRadius: borderRadius,
+              strokeAlign: strokeAlign,
+              strokeCap: strokeCap,
+            ),
+            child: Center(child: child),
+          );
+        },
       ),
     );
   }
