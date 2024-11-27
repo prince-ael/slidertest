@@ -3,13 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:slidertest/custom_paint/mask.dart';
 import 'package:slidertest/custom_paint/mask_window.dart';
+import 'package:slidertest/dot_animation/jumping_dots.dart';
 import 'package:slidertest/progressbar/square_progressbar.dart';
 
 const bg = Color(0xFF5B6355);
 const clearColor = Colors.transparent;
 
 void main() {
-  runApp(const MyApp());
+  runApp(const JumpingDotsApp());
 }
 
 class MyApp extends StatelessWidget {
